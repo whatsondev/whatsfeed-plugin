@@ -1,7 +1,9 @@
 <?php
 add_shortcode('instagram_feed', function($atts) {
+    $default_limit = get_option('whatsfeed_default_limit', 6);
+
     $atts = shortcode_atts([
-        'limit' => 6 // default number of posts
+        'limit' => $default_limit // default comes from admin setting
     ], $atts);
 
     $token   = get_option('whatsfeed_access_token');

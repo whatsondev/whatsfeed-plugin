@@ -15,6 +15,7 @@ add_action('admin_menu', function() {
 add_action('admin_init', function() {
     register_setting('whatsfeed_options', 'whatsfeed_access_token');
     register_setting('whatsfeed_options', 'whatsfeed_user_id');
+    register_setting('whatsfeed_options', 'whatsfeed_default_limit'); // NEW
 });
 
 function whatsfeed_settings_page_html() {
@@ -41,6 +42,15 @@ function whatsfeed_settings_page_html() {
                         <input type="text" name="whatsfeed_user_id"
                                value="<?php echo esc_attr(get_option('whatsfeed_user_id')); ?>"
                                class="regular-text" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Default Post Limit</th>
+                    <td>
+                        <input type="number" name="whatsfeed_default_limit"
+                               value="<?php echo esc_attr(get_option('whatsfeed_default_limit', 6)); ?>"
+                               class="small-text" min="1" max="50" />
+                        <p class="description">Default number of posts to show if no limit is set in shortcode.</p>
                     </td>
                 </tr>
             </table>
