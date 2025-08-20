@@ -1,19 +1,20 @@
 <?php
 add_shortcode('instagram_feed', function($atts) {
     $default_limit = get_option('whatsfeed_default_limit', 6);
+    $grid_columns    = get_option('whatsfeed_grid_columns', 3);
 
     $atts = shortcode_atts([
-        'limit' => $default_limit // default comes from admin setting
+        'limit' => $default_limit, // default comes from admin setting
+        'columns' => $grid_columns
     ], $atts);
 
-    $token   = get_option('whatsfeed_access_token');
+     $token   = get_option('whatsfeed_access_token');
     $user_id = get_option('whatsfeed_user_id');
 
     if (empty($token) || empty($user_id)) {
         return "<p>Please set your Instagram Access Token & User ID in <b>WhatsFeed settings</b>.</p>";
     }
 
-    // Check cached results (1 hour)
     $cache_key = 'whatsfeed_cache_' . $user_id;
     $cached    = get_transient($cache_key);
 
@@ -33,14 +34,13 @@ add_shortcode('instagram_feed', function($atts) {
         }
 
         $data = $body['data'];
-        set_transient($cache_key, $data, HOUR_IN_SECONDS); // cache for 1 hour
+        set_transient($cache_key, $data, HOUR_IN_SECONDS);
     }
 
-    // Apply shortcode limit
     $posts = array_slice($data, 0, intval($atts['limit']));
 
-    // Build output
-    $output = '<div class="whatsfeed-grid">';
+    // Feed output with column class
+    $output = '<div class="whatsfeed-grid columns-' . intval($atts['columns']) . '">';
     foreach ($posts as $post) {
         if ($post['media_type'] == 'IMAGE' || $post['media_type'] == 'CAROUSEL_ALBUM') {
             $output .= '<a href="' . esc_url($post['permalink']) . '" target="_blank" class="whatsfeed-item">
