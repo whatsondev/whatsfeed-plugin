@@ -84,6 +84,9 @@ require_once WHATSFEED_PLUGIN_DIR . 'admin/settings-page.php';
 // Initialize shortcode
 $whatsfeed_shortcode = new WhatsFeed_Shortcode();
 
+// Register username-only Instagram shortcode
+add_shortcode('whatsfeed_instagram_username', [$whatsfeed_shortcode, 'instagram_username_shortcode']);
+
 // Legacy shortcode support
 add_shortcode('instagram_feed', 'whatsfeed_legacy_shortcode_handler');
 function whatsfeed_legacy_shortcode_handler($atts) {

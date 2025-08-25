@@ -10,4 +10,8 @@ class WhatsFeed_Cache {
     public static function set( $key, $data, $expiration = 3600 ) {
         set_transient( 'whatsfeed_' . $key, $data, $expiration );
     }
+    
+    public static function delete( $key ) {
+        return delete_transient( 'whatsfeed_' . $key );
+    }
 }

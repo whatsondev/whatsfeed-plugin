@@ -1,9 +1,35 @@
-<?php if ( ! empty($data) ) : ?>
+<?php
+// Debug information
+if ( is_wp_error($data) ) {
+    echo '<div style="border: 1px solid #f00; padding: 10px; margin: 10px 0; background: #fff;">';
+    echo '<strong>Error:</strong> ' . esc_html($data->get_error_message());
+    echo '</div>';
+}
+
+// Debug data structure
+if ( empty($data) ) {
+    echo '<div style="border: 1px solid #f00; padding: 10px; margin: 10px 0; background: #fff;">';
+    if ($atts['source'] === 'both') {
+        echo '<strong>Notice:</strong> No data available from Instagram or TikTok. Please configure at least one social media account in the WhatsFeed settings.';
+    } else {
+        echo '<strong>Notice:</strong> No data available from ' . esc_html(ucfirst($atts['source'])) . '. Please check your credentials in the WhatsFeed settings.';
+    }
+    echo '</div>';
+}
+
+if ( ! empty($data) ) : ?>
     <?php if ( $atts['layout'] === 'grid' ) : ?>
         <div class="whatsfeed-grid columns-<?php echo esc_attr( $atts['columns'] ?? 3 ); ?>">
             <?php foreach ( $data as $item ) : ?>
                 <?php 
-                $source = $atts['source'] ?? 'instagram';
+                // Determine the source based on item structure when using 'both' source
+                if ($atts['source'] === 'both') {
+                    // TikTok items have cover_image_url, Instagram items have media_url
+                    $source = isset($item['cover_image_url']) ? 'tiktok' : 'instagram';
+                } else {
+                    $source = $atts['source'] ?? 'instagram';
+                }
+                
                 $is_video = isset($item['media_type']) && $item['media_type'] === 'VIDEO';
                 $is_tiktok_video = $source === 'tiktok';
                 $media_url = $item['media_url'] ?? $item['cover_image_url'] ?? '';
@@ -13,11 +39,8 @@
                 ?>
                 <div class="whatsfeed-item <?php echo esc_attr($source); ?>">
                     <div class="whatsfeed-media">
-                        <span class="whatsfeed-source <?php echo esc_attr($source); ?>">
-                            <?php echo esc_html(ucfirst($source)); ?>
-                        </span>
                         
-                        <?php if ( $atts['open_in_popup'] === 'yes' ) : ?>
+                        <?php if ( isset($atts['open_in_popup']) && $atts['open_in_popup'] === 'yes' ) : ?>
                             <a href="<?php echo esc_url($media_url); ?>" 
                                class="whatsfeed-popup-link" 
                                data-caption="<?php echo esc_attr($caption); ?>" 
@@ -35,7 +58,7 @@
                         </a>
                     </div>
                     
-                    <?php if ( $atts['show_captions'] === 'yes' && !empty($caption) ) : ?>
+                    <?php if ( isset($atts['show_captions']) && $atts['show_captions'] === 'yes' && !empty($caption) ) : ?>
                         <div class="whatsfeed-caption">
                             <?php echo esc_html(wp_trim_words($caption, 15)); ?>
                         </div>
@@ -44,7 +67,7 @@
             <?php endforeach; ?>
         </div>
         
-        <?php if ( $atts['open_in_popup'] === 'yes' ) : ?>
+        <?php if ( isset($atts['open_in_popup']) && $atts['open_in_popup'] === 'yes' ) : ?>
             <div class="whatsfeed-popup" id="whatsfeed-popup" style="display:none;">
                 <div class="whatsfeed-popup-overlay"></div>
                 <div class="whatsfeed-popup-content">
@@ -72,11 +95,8 @@
                         <div class="swiper-slide">
                             <div class="whatsfeed-item <?php echo esc_attr($source); ?>">
                                 <div class="whatsfeed-media">
-                                    <span class="whatsfeed-source <?php echo esc_attr($source); ?>">
-                                        <?php echo esc_html(ucfirst($source)); ?>
-                                    </span>
                                     
-                                    <?php if ( $atts['open_in_popup'] === 'yes' ) : ?>
+                                    <?php if ( isset($atts['open_in_popup']) && $atts['open_in_popup'] === 'yes' ) : ?>
                                         <a href="<?php echo esc_url($media_url); ?>" 
                                            class="whatsfeed-popup-link" 
                                            data-caption="<?php echo esc_attr($caption); ?>" 
@@ -94,7 +114,7 @@
                                     </a>
                                 </div>
                                 
-                                <?php if ( $atts['show_captions'] === 'yes' && !empty($caption) ) : ?>
+                                <?php if ( isset($atts['show_captions']) && $atts['show_captions'] === 'yes' && !empty($caption) ) : ?>
                                     <div class="whatsfeed-caption">
                                         <?php echo esc_html(wp_trim_words($caption, 15)); ?>
                                     </div>
@@ -110,7 +130,7 @@
             </div>
         </div>
         
-        <?php if ( $atts['open_in_popup'] === 'yes' ) : ?>
+        <?php if ( isset($atts['open_in_popup']) && $atts['open_in_popup'] === 'yes' ) : ?>
             <div class="whatsfeed-popup" id="whatsfeed-popup" style="display:none;">
                 <div class="whatsfeed-popup-overlay"></div>
                 <div class="whatsfeed-popup-content">
